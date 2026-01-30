@@ -74,7 +74,7 @@ public static class RomanConverter
             (_, var unresVar, var romanVar)
                 when unresVar.Count > 0 && unresVar.First() > romanVar.First()   
                 => ToIntegerHelper(runningtotal + unresVar.Sum(),
-                    new List<int>(){romanVar.First()},  romanVar.Skip(1).ToList(), originalRoman),
+                    new List<int>(),  romanVar, originalRoman),
             
             _ => ToIntegerHelper(
                 runningtotal,
