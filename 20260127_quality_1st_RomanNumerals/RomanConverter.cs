@@ -65,15 +65,15 @@ public static class RomanConverter
                     "Invalid Roman numeral substraction"),
             
             // Smaller_value_precedes_larger_Positive
-            (var runningVar, var unresVar, var romanVar)
+            (_, var unresVar, var romanVar)
                 when unresVar.Count > 0 && unresVar.First() < romanVar.First() 
-                => ToIntegerHelper(runningVar - unresVar.Sum(),
+                => ToIntegerHelper(runningtotal - unresVar.Sum(),
                     new List<int>(),  romanVar, originalRoman),
             
             // Larger_value_precedes_smaller
-            (var runningVar, var unresVar, var romanVar)
+            (_, var unresVar, var romanVar)
                 when unresVar.Count > 0 && unresVar.First() > romanVar.First()   
-                => ToIntegerHelper(runningVar + unresVar.Sum(),
+                => ToIntegerHelper(runningtotal + unresVar.Sum(),
                     new List<int>(){romanVar.First()},  romanVar.Skip(1).ToList(), originalRoman),
             
             _ => ToIntegerHelper(
