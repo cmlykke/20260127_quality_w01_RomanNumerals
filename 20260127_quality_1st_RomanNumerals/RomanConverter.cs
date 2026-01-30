@@ -64,7 +64,7 @@ public static class RomanConverter
                 => throw new ArgumentException(originalRoman,
                     "Invalid Roman numeral substraction"),
             
-            // Smaller_value_precedes_larger_PositiveTest
+            // Smaller_value_precedes_larger
             (_, var unresVar, var romanVar)
                 when unresVar.Count > 0 && unresVar.First() < romanVar.First() 
                 => ToIntegerHelper(runningtotal - unresVar.Sum(),
