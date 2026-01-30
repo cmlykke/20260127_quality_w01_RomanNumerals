@@ -67,8 +67,8 @@ public static class RomanConverter
             // Smaller_value_precedes_larger_Positive
             (var runningVar, var unresVar, var romanVar)
                 when unresVar.Count > 0 && unresVar.First() < romanVar.First() 
-                => ToIntegerHelper(runningVar + romanVar.First() - unresVar.Sum(),
-                    new List<int>(),  romanints.Skip(1).ToList(), originalRoman),
+                => ToIntegerHelper(runningVar - unresVar.Sum(),
+                    new List<int>(),  romanints, originalRoman),
             
             // Larger_value_precedes_smaller
             (var runningVar, var unresVar, var romanVar)
