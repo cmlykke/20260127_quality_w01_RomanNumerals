@@ -58,7 +58,7 @@ public static class RomanConverter
                     "Roman numerals V, L, and D can not be repeated"),
             
             // Smaller_value_precedes_larger_Negative
-            (var runningVar, var unresVar, var romanVar)
+            (_, var unresVar, var romanVar)
                 when unresVar.Count > 0 && unresVar.First() < romanVar.First() 
                                         && unresVar.First().ToString().First() == '5'
                 => throw new ArgumentException(originalRoman,
@@ -68,13 +68,13 @@ public static class RomanConverter
             (var runningVar, var unresVar, var romanVar)
                 when unresVar.Count > 0 && unresVar.First() < romanVar.First() 
                 => ToIntegerHelper(runningVar - unresVar.Sum(),
-                    new List<int>(),  romanints, originalRoman),
+                    new List<int>(),  romanVar, originalRoman),
             
             // Larger_value_precedes_smaller
             (var runningVar, var unresVar, var romanVar)
                 when unresVar.Count > 0 && unresVar.First() > romanVar.First()   
                 => ToIntegerHelper(runningVar + unresVar.Sum(),
-                    new List<int>(){romanVar.First()},  romanints.Skip(1).ToList(), originalRoman),
+                    new List<int>(){romanVar.First()},  romanVar.Skip(1).ToList(), originalRoman),
             
             _ => ToIntegerHelper(
                 runningtotal,
