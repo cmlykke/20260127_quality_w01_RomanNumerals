@@ -35,8 +35,8 @@ public static class RomanConverter
         return (runningtotal, unresolved, romanints) switch
         {
             // Largest_value_is_3999_NegativeTest
-            (var runningVar, var unresVar, {Count: 0}) 
-                when runningVar + unresVar.Sum() > 3999 
+            (_, _, {Count: 0}) 
+                when runningtotal + unresolved.Sum() > 3999 
                 => throw new ArgumentException(originalRoman,
                     "Numeric value is above maximum allowed: 3999"),
             
@@ -44,37 +44,32 @@ public static class RomanConverter
                 => runningtotal + unresolved.Sum(),
             
             // IXCM_can_be_repeated_3_times_NegativeTest
-            (_, _, var romanTemp) 
-                when romanTemp.First().ToString().First() == '1' && 
-                     unresolved.Sum() / (double)romanTemp.First() == 3 
+            _ when romanints.First().ToString().First() == '1' && 
+                   unresolved.Sum() / (double)romanints.First() == 3 
                 => throw new ArgumentException(originalRoman,
                     "Roman numerals cannot repeat more than three times"),
             
             // VLD_can_not_be_repeated_NetagiveTest
-            (_, _, var romanTemp) 
-                when romanTemp.First().ToString().First() == '5' && 
-                     unresolved.Sum() / (double)romanTemp.First() == 1 
+            _ when romanints.First().ToString().First() == '5' && 
+                   unresolved.Sum() / (double)romanints.First() == 1 
                 => throw new ArgumentException(originalRoman,
                     "Roman numerals V, L, and D can not be repeated"),
             
             // Smaller_value_precedes_larger_NegativeTest
-            (_, var unresVar, var romanVar)
-                when unresVar.Count > 0 && unresVar.First() < romanVar.First() 
-                                        && unresVar.First().ToString().First() == '5'
+            _ when unresolved.Count > 0 && unresolved.First() < romanints.First() 
+                                        && unresolved.First().ToString().First() == '5'
                 => throw new ArgumentException(originalRoman,
                     "Invalid Roman numeral substraction"),
             
             // Smaller_value_precedes_larger
-            (_, var unresVar, var romanVar)
-                when unresVar.Count > 0 && unresVar.First() < romanVar.First() 
-                => ToIntegerHelper(runningtotal - unresVar.Sum(),
-                    new List<int>(),  romanVar, originalRoman),
+            _ when unresolved.Count > 0 && unresolved.First() < romanints.First() 
+                => ToIntegerHelper(runningtotal - unresolved.Sum(),
+                    new List<int>(),  romanints, originalRoman),
             
             // Larger_value_precedes_smaller
-            (_, var unresVar, var romanVar)
-                when unresVar.Count > 0 && unresVar.First() > romanVar.First()   
-                => ToIntegerHelper(runningtotal + unresVar.Sum(),
-                    new List<int>(),  romanVar, originalRoman),
+            _ when unresolved.Count > 0 && unresolved.First() > romanints.First()   
+                => ToIntegerHelper(runningtotal + unresolved.Sum(),
+                    new List<int>(),  romanints, originalRoman),
             
             _ => ToIntegerHelper(
                 runningtotal,
