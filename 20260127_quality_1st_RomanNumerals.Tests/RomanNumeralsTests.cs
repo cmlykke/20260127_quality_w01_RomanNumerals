@@ -5,7 +5,7 @@ using Xunit;
 public class RomanNumeralsTests
 {
  
-    private static Func<string, int> GenericRomanToInt = RomanConverter_V2.ToInteger;
+    private static Func<string, int> GenericRomanToInt = RomanConverter_V3.ToInteger;
     
     //Non-roman input tests:
     
@@ -19,7 +19,7 @@ public class RomanNumeralsTests
 
         Assert.Contains("null is not allowed as an input, only I, V, X, L, C, D, M are allowed", 
             ex.Message, 
-            StringComparison.OrdinalIgnoreCase);
+            StringComparison.Ordinal);
     }
     
     [Theory]
@@ -32,7 +32,7 @@ public class RomanNumeralsTests
 
         Assert.Contains("an empty string is not allowed", 
             ex.Message, 
-            StringComparison.OrdinalIgnoreCase);
+            StringComparison.Ordinal);
     }
     
     [Theory]
@@ -53,7 +53,27 @@ public class RomanNumeralsTests
 
         Assert.Contains("only I, V, X, L, C, D, M are allowed", 
             ex.Message, 
-            StringComparison.OrdinalIgnoreCase);
+            StringComparison.Ordinal);
+    }
+    
+    // input that breaks real-world roman numeral rules, regardless of the specification
+    
+    [Theory]
+    // substracting I from C is not illegal according to the specification, 
+    // but real roman numerals dont allow it
+    [InlineData("IC")]    
+    // occilating strings like, IVIVIVIV is allowed by the specification,
+    // but real roman numerals dont allow it
+    [InlineData("XXXIVIVIVIVIV")]  
+    public void Strings_that_break_real_roman_numerals_NegativeTests(string roman)
+    {
+        var ex = Assert.Throws<ArgumentException>(
+            () => GenericRomanToInt(roman)
+        );
+
+        Assert.Contains("Input allowed by specification, but not by real world roman numerals.", 
+            ex.Message, 
+            StringComparison.Ordinal);
     }
     
     //Specification tests:
@@ -117,7 +137,7 @@ public class RomanNumeralsTests
         );
 
         Assert.Contains("Invalid Roman numeral substraction", 
-            exception.Message, StringComparison.OrdinalIgnoreCase);
+            exception.Message, StringComparison.Ordinal);
     }
     
     [Theory]
@@ -143,7 +163,7 @@ public class RomanNumeralsTests
         );
 
         Assert.Contains("Roman numerals cannot repeat more than three times", 
-            exception.Message, StringComparison.OrdinalIgnoreCase);
+            exception.Message, StringComparison.Ordinal);
     }
     
     [Theory]
@@ -159,7 +179,7 @@ public class RomanNumeralsTests
         );
 
         Assert.Contains("Roman numerals V, L, and D can not be repeated", 
-            exception.Message, StringComparison.OrdinalIgnoreCase);
+            exception.Message, StringComparison.Ordinal);
     }
     
     [Theory]
@@ -182,6 +202,6 @@ public class RomanNumeralsTests
         );
 
         Assert.Contains("Numeric value is above maximum allowed: 3999", 
-            exception.Message, StringComparison.OrdinalIgnoreCase);
+            exception.Message, StringComparison.Ordinal);
     }
 }
