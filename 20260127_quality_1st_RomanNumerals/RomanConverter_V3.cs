@@ -25,7 +25,10 @@ public class RomanConverter_V3
         List<int?> romanints = roman.Select(x => (int?)getRomanOrThrow(x)).ToList();
         List<(int?,int?)> romanpairs = romanints.Prepend(null).Zip(romanints.Append(null), (a, b) => (a, b)).ToList();
         
-        return ToIntegerHelper(new List<int>(),romanpairs, 0, roman);
+        int result = ToIntegerHelper(new List<int>(),romanpairs, 0, roman);
+        if (result > 3999) throw new ArgumentException(roman,
+                "Numeric value is above maximum allowed: 3999");
+        return result;
     }
 
     private static int ToIntegerHelper(
@@ -39,54 +42,48 @@ public class RomanConverter_V3
         int? secondHeadDigit = romanpairs.First().Item2.HasValue ? 
             int.Parse(romanpairs.First().Item2.Value.ToString().First().ToString()) : null;
         int secondGreaterThanFirst = (romanpairs.First().Item2 ?? 0) - (romanpairs.First().Item1 ?? 0);
-        int cumulativeSum = result.Sum();
         
-        return (cumulativeSum, repetition, firstHeadDigit, secondHeadDigit, secondGreaterThanFirst) switch
+        return (repetition, firstHeadDigit, secondHeadDigit, secondGreaterThanFirst) switch
         {
-            // Largest_value_is_3999
-            (> 3999, _,int, null, _)
-                => throw new ArgumentException(originalRoman,
-                    "Numeric value is above maximum allowed: 3999"),
-            
             // last item is null - recursion ends
-            (<= 3999, _, int, null, _)
-                => cumulativeSum,
+            ( _, int, null, _)
+                => result.Sum(),
             
             // first item is null - first iteration
-            (_, _, null, int, _) 
+            ( _, null, int, _) 
                 => ToIntegerHelper([..result, romanpairs.First().Item2.Value], 
                     romanpairs.Skip(1).ToList(), repetition + 1, originalRoman),
             
             // if both tupple values are the same, increment the repetition counter
-            (_, < 3, 1, 1, 0) => 
+            ( < 3, 1, 1, 0) => 
                 ToIntegerHelper(
                     [.. result[..^1], romanpairs.First().Item2.Value + result[^1]], 
                     romanpairs.Skip(1).ToList(), repetition + 1, originalRoman),
             
             // a smaller roman numeral found, = reset the repetition counter
-            (_, _, int, int, < 0) => 
+            ( _, int, int, < 0) => 
                 ToIntegerHelper(
                     [.. result, romanpairs.First().Item2.Value],
                     romanpairs.Skip(1).ToList(), 1, originalRoman),
             
             // IXCM_can_be_repeated_3_times_NegativeTests
-            (_, 3,1,1, 0)
+            ( 3,1,1, 0)
                 => throw new ArgumentException(originalRoman,
                     "Roman numerals cannot repeat more than three times"),
             
             // VLD_can_not_be_repeated_NetagiveTest
-            (_, _,5,5, 0)
+            (_,5,5, 0)
                 => throw new ArgumentException(originalRoman,
                     "Roman numerals V, L, and D can not be repeated"),
             
             // smaller_value_precedes_larger (perform substraction)
-            (_, _, 1, int, > 0) => 
+            (_, 1, int, > 0) => 
                 ToIntegerHelper(
                     [.. result[..^1], romanpairs.First().Item2.Value - result[^1]],
                     romanpairs.Skip(1).ToList(), 1, originalRoman),
             
             // Smaller_value_precedes_larger_NegativeTests (illegal substraction)
-            (_, _, 5, 1, > 0)
+            (_, 5, 1, > 0)
                 => throw new ArgumentException(originalRoman,
                     "Invalid Roman numeral substraction"),
             
