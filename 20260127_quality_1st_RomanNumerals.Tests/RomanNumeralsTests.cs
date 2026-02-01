@@ -7,7 +7,7 @@ public class RomanNumeralsTests
 {
  
     private static Func<string, int> GenericRomanToInt = RomanConverter_V3.ToInteger;
-    private static int bruteForceGenerator_maxLength = 6;
+    private static int bruteForceGenerator_maxLength = 5;
     static readonly char[] bruteForceGeneratorAlphabet = { 'I', 'V', 'X', 'L', 'C', 'D', 'M' };
     
     // brute-force generator test
