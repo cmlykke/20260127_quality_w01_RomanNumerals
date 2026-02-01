@@ -122,7 +122,9 @@ public class RomanNumerals_Blackbox_Tests
     
     [Theory]
     [InlineData("IV",      4)]
+    [InlineData("IX",      9)]
     [InlineData("XL",     40)]
+    [InlineData("XC",      90)]
     [InlineData("CD",     400)]
     [InlineData("CM",      900)]
     public void Smaller_value_precedes_larger_PositiveTests(string roman, int expected)
