@@ -7,7 +7,7 @@ using System.Collections.Generic;
 public class RomanNumerals_Blackbox_Tests
 {
  
-    private static Func<string, int> GenericRomanToInt = RomanConverter_V3.ToInteger;
+    private static Func<string, int> GenericRomanToInt = RomanConverter_V4.ToInteger;
     
     //Non-roman input tests:
     [Theory]

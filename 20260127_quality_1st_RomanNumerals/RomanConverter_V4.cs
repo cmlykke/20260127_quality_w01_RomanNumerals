@@ -45,58 +45,63 @@ public class RomanConverter_V4
         int? secondHeadDigit = romanpairs.First().Item2.HasValue ? 
             int.Parse(romanpairs.First().Item2.Value.ToString().First().ToString()) : null;
         int firstGreaterThanSecond = (romanpairs.First().Item1 ?? 0) - (romanpairs.First().Item2 ?? 0);
-        
-        return (repetition, firstHeadDigit, secondHeadDigit, firstGreaterThanSecond) switch
+        // Single source of truth: classify using Decide(...), then act on the decision
+        var decision = Decide(repetition, firstHeadDigit, secondHeadDigit, firstGreaterThanSecond);
+
+        switch (decision)
         {
-            // Last item is null - recursion ends
-            ( _, int, null, _)
-                => result.Sum(),
-            
-            // First item is null - first iteration
-            ( _, null, int, _) 
-                => ToIntegerHelper([..result, romanpairs.First().Item2.Value], 
-                    romanpairs.Skip(1).ToList(), repetition + 1, originalRoman),
-            
-            // Larger_value_precedes_smaller
-            ( _, int, int, > 0) => 
-                ToIntegerHelper(
-                    [.. result, romanpairs.First().Item2.Value],
-                    romanpairs.Skip(1).ToList(), 1, originalRoman),
-            
-            // If both tupple values are the same, increment the repetition counter
-            ( < 3, 1, 1, 0) => 
-                ToIntegerHelper(
-                    [.. result[..^1], romanpairs.First().Item2.Value + result[^1]], 
-                    romanpairs.Skip(1).ToList(), repetition + 1, originalRoman),
-            
-            // IXCM_can_be_repeated_3_times_NegativeTests
-            ( >= 3,1,1, 0)
-                => throw new ArgumentException(originalRoman,
-                    "Roman numerals cannot repeat more than three times"),
-            
-            // VLD_can_not_be_repeated_NetagiveTest
-            (_,5,5, 0)
-                => throw new ArgumentException(originalRoman,
-                    "Roman numerals V, L, and D can not be repeated"),
-            
-            // Smaller_value_precedes_larger (perform substraction)
-            (_, 1, int, < 0) => 
-                ToIntegerHelper(
-                    [.. result[..^1], romanpairs.First().Item2.Value - result[^1]],
-                    romanpairs.Skip(1).ToList(), 1, originalRoman),
-            
-            // Smaller_value_precedes_larger_NegativeTests (illegal substraction)
-            (_, 5, int, < 0)
-                => throw new ArgumentException(originalRoman,
-                    "Invalid Roman numeral substraction"),
-            
-            _ => throw new InternalInvariantViolationException(
-                $"Default arm reached in ToIntegerHelper for tuple " +
-                $"(rep={repetition}, " +
-                $"a={firstHeadDigit?.ToString() ?? "null"}, " +
-                $"b={secondHeadDigit?.ToString() ?? "null"}, " +
-                $"cmp={firstGreaterThanSecond}) while processing '{originalRoman}'"),
-        };
+            case Decision.End:
+                // Last item is null - recursion ends
+                return result.Sum();
+
+            case Decision.FirstIter:
+                // First item is null - first iteration
+                return ToIntegerHelper(
+                    [.. result, romanpairs.First().Item2!.Value],
+                    romanpairs.Skip(1).ToList(), repetition + 1, originalRoman);
+
+            case Decision.LargerPrecedesSmaller:
+                // Larger value precedes smaller: push current and reset repetition
+                return ToIntegerHelper(
+                    [.. result, romanpairs.First().Item2!.Value],
+                    romanpairs.Skip(1).ToList(), 1, originalRoman);
+
+            case Decision.AddRepeat:
+                // Equal 1s under repeat limit: fold into last and increment repetition
+                return ToIntegerHelper(
+                    [.. result[..^1], romanpairs.First().Item2!.Value + result[^1]],
+                    romanpairs.Skip(1).ToList(), repetition + 1, originalRoman);
+
+            case Decision.TooManyRepeats:
+                // More than three repeats of I/X/C/M are not allowed
+                throw new ArgumentException(originalRoman,
+                    "Roman numerals cannot repeat more than three times");
+
+            case Decision.RepeatVLD:
+                // V, L, D cannot repeat
+                throw new ArgumentException(originalRoman,
+                    "Roman numerals V, L, and D can not be repeated");
+
+            case Decision.Subtract:
+                // Subtractive pair with head 1: compute difference and reset repetition
+                return ToIntegerHelper(
+                    [.. result[..^1], romanpairs.First().Item2!.Value - result[^1]],
+                    romanpairs.Skip(1).ToList(), 1, originalRoman);
+
+            case Decision.IllegalSubtract:
+                // Illegal subtract (e.g., V before X)
+                throw new ArgumentException(originalRoman,
+                    "Invalid Roman numeral substraction");
+
+            default:
+                // DefaultUnexpected → our internal invariant
+                throw new InternalInvariantViolationException(
+                    $"Default arm reached in ToIntegerHelper for tuple " +
+                    $"(rep={repetition}, " +
+                    $"a={firstHeadDigit?.ToString() ?? "null"}, " +
+                    $"b={secondHeadDigit?.ToString() ?? "null"}, " +
+                    $"cmp={firstGreaterThanSecond}) while processing '{originalRoman}'");
+        }
     }
     
     // Internal decision surface for tests only
