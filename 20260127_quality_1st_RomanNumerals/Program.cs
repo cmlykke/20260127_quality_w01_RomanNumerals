@@ -7,7 +7,7 @@ namespace _20260127_quality_1st_RomanNumerals;
 
 class Program
 {
-    private static Func<string, int> GenericRomanToInt = RomanConverter_V3.ToInteger;
+    private static Func<string, int> GenericRomanToInt = RomanConverter_V4.ToInteger;
     static void Main(string[] args)
     {
         Console.WriteLine("Roman Numeral → Integer Converter");
